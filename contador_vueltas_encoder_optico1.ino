@@ -29,13 +29,13 @@ bool fran = false;
 bool hola = false;
 
 unsigned long tiempoAhora = 0;
-int intervalo = 500;
+int intervalo = 1000;
 
 unsigned long tiempoAhora2 = 0;
 int intervalo2 = 500;
 
-int pwmDER = 120;
-int pwmIZ = 60;
+int pwmDER = 140;
+int pwmIZ = 120;
 
 float diferenciaVPS;
 
@@ -173,8 +173,6 @@ void loop() {
 float diferenciaDER = vueltasDER - vueltasIZ;
 float diferenciaIZ = vueltasIZ - vueltasDER;
 
-
-
 float vpsDER;
 float vpsIZ;
 
@@ -213,6 +211,9 @@ if(millis() == (tiempoAhora + intervalo)){
 
 if((millis() == (tiempoAhora2 + intervalo2)) && (pollo == false)){
   tiempoAhora2 = millis();
+
+  
+  
   }
 
 //correcion de pwmDER
@@ -231,7 +232,18 @@ if(diferenciaVPS != 0){
 //FIN correcion de pwmIZ
 //CORRECION TERMINADA
 if(vueltasDER == 80){
-  
+
+  int TiempoFinal = (millis() /1000);
+
+    float VueltasPorSegundoDerecha = (medicionesDER/(20 * TiempoFinal));
+    float VueltasPorSegundoIzquierda = (medicionesIZ/(20 * TiempoFinal));
+
+    Serial.println("---------------------Terminado--------------------------");
+    Serial.print("Vueltas por segundo Motor Derecha: ");
+    Serial.print(VueltasPorSegundoDerecha);
+    Serial.print("Vueltas por segundo Motor Izquierda: ");
+    Serial.print(VueltasPorSegundoIzquierda);
+    Serial.println(pwmDER);
   
   analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
   analogWrite(ENBIZ, 0);
