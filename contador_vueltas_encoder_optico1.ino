@@ -1,8 +1,8 @@
 const int sensorPinIZ = 2;
 const int sensorPinDER = 3;
 
-float medicionesIZ = 0;
-float medicionesDER = 0;
+float medicionesIZ = 0; //Javier gei
+float medicionesDER = 0; //Ariel pro 
 
 int valueIZ = 0;
 int valueDER = 0;
@@ -29,13 +29,13 @@ bool fran = false;
 bool hola = false;
 
 unsigned long tiempoAhora = 0;
-int intervalo = 1000;
+int intervalo = 100;
 
 unsigned long tiempoAhora2 = 0;
 int intervalo2 = 500;
 
-int pwmDER = 140;
-int pwmIZ = 120;
+int pwmDER = 80;
+int pwmIZ = 60;
 
 float diferenciaVPS;
 
@@ -73,22 +73,13 @@ void loop() {
   if (valueIZ == LOW && checkIZ == 0) {
     medicionesIZ++;
     millisMedicionesIZ++;
-//    Serial.print("Mediciones:");
-//    Serial.println(medicionesIZ);
     checkIZ = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
   }
   if (valueIZ == HIGH && checkIZ == 1) {
     checkIZ = 0;
   }
   float vueltasIZ = medicionesIZ / divisionesRueda;//se calculan las vueltas realizadas en base a las mediciones
-  /*Esto lo podria comentar*/
-//  if (Serial.available() > 0) {
-//    if (Serial.read() == '1') {
-//      Serial.print("Vueltas:");
-//      Serial.println (vueltasIZ);
-//    }
-//  }
-/**/
+  
 //--------------------------------------------------------FIN ENCODER IZQUIERDA--------------------------------------------------------------
 //---------------------------------------------------------ENCODER DERECHA--------------------------------------------------------------
   valueDER = digitalRead(sensorPinDER );  //lectura digital de pin
@@ -96,68 +87,15 @@ void loop() {
   if (valueDER == LOW && checkDER == 0) {
     medicionesDER++;
     millisMedicionesDER++;
-//    Serial.print("Mediciones 2:");
-//    Serial.println(medicionesDER);
     checkDER = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
   }
   if (valueDER == HIGH && checkDER == 1) {
     checkDER = 0;
   }
   float vueltasDER = medicionesDER / divisionesRueda;//se calculan las vueltas realizadas en base a las mediciones
-  /*Esto lo podria comentar*/
-//  if (Serial.available() > 0) {
-//    if (Serial.read() == '2') {
-//      Serial.print("Vueltas 2:");
-//      Serial.println (vueltasDER);
-//    }
-//  }
-/**/
+  
 //--------------------------------------------------------FIN ENCODER DERECHA--------------------------------------------------------------
-//  if (prueba1 == true){
-//    analogWrite(ENADER, 167);
-//    digitalWrite(IN1DER, HIGH);
-//    digitalWrite(IN2DER, LOW);
-//  }
-//  if (prueba2 == true){
-//    analogWrite(ENBIZ, 255);
-//    digitalWrite(IN3IZ, HIGH);
-//    digitalWrite(IN4IZ, LOW);
-//  }
-//
-//
-//  if (medicionesIZ > 226.8)
-//  {
-//     analogWrite(ENADER, 0);
-//    digitalWrite(IN1DER, HIGH);
-//    digitalWrite(IN2DER, HIGH);
-//    prueba1 =false;
-//    }
-//   if (medicionesIZ > 200)
-//  {
-//     analogWrite(ENADER, 0);
-//    digitalWrite(IN1DER, HIGH);
-//    digitalWrite(IN2DER, HIGH);
-//    pollo = true;
-//    Serial.print ("Mediciones: ");
-//    Serial.println (medicionesIZ);
-//    Serial.print ("tiempo: ");
-//    Serial.println (millis());
-//    
-//    }
-//    if (millis() - tiempo0 > 7000)
-//    {
-//      analogWrite(ENADER, 0);
-//      analogWrite(ENBIZ,  0);
-//      pollo = true;
-//      digitalWrite(IN1DER, HIGH);
-//      digitalWrite(IN2DER, HIGH);
-//      digitalWrite(IN3IZ, HIGH);
-//      digitalWrite(IN4IZ, HIGH);
-//      Serial.print ("Motor derecho: ");
-//      Serial.println (medicionesDER);
-//      Serial.print ("Motor izquierdo: ");
-//      Serial.println (medicionesIZ);
-//      }
+
 //----------------------------------------------------------MANEJO DE PWM-----------------------------------------------------
  if (pollo == false ){
    analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
@@ -182,7 +120,7 @@ if(millis() == (tiempoAhora + intervalo)){
   vpsDER = millisMedicionesDER / divisionesRueda;
   vpsIZ = millisMedicionesIZ / divisionesRueda;
 
-  diferenciaVPS = (vpsDER - vpsIZ)*20;
+  diferenciaVPS = (vpsDER - vpsIZ)*5;
 
   Serial.print("Vueltas por segundo MOTOR-DERECHA: ");
   Serial.print(vpsDER);
@@ -258,78 +196,5 @@ if(vueltasDER == 80){
 //FIN CORRECION TERMINADA
 
 //Fin Codigo Javier
-
-//        Serial.print ("vueltas1: ");
-//        Serial.print (medicionesDER);
-//        Serial.print ("vuesltas2: ");
-//        Serial.println (medicionesIZ);
-//        Serial.print ("time : ");
-
-//----------------------------------------------------------MUESTRA DE DATOS POR PUERTO SERIE-----------------------------------------------------
-//     if ((medicionesIZ >= 86.83) || (medicionesDER >= 86.83))
-//      {
-//          Serial.print ("vueltas1: ");
-//          Serial.print (vueltasDER);
-//          Serial.print ("vueltas2: ");
-//          Serial.println (vueltasIZ);
-//          Serial.print ("time : ");
-//          Serial.println (millis());
-//          
-//          analogWrite(ENADER, 0);
-//          analogWrite(ENBIZ, 0);
-//          
-//          digitalWrite(IN1DER, LOW);
-//          digitalWrite(IN2DER, LOW);
-//          digitalWrite(IN3IZ, LOW);
-//          digitalWrite(IN4IZ, LOW);
-//          
-//          pollo = true;  
-//     }
-//----------------------------------------------------------FIN DE MUESTRA DE DATOS POR PUERTO SERIE-----------------------------------------------------
-//Codigo Juan
-//    if (pollo == true){
-//      int diferencia;
-//      diferencia = abs(medicionesDER) - abs(medicionesIZ);
-//      if (medicionesDER > medicionesIZ){
-//        int correccionDER;
-//        
-//        correccionDER =  (diferencia/medicionesDER);
-//        pwmDER = 255 - (255*correccionDER);
-//      }
-//      if (medicionesIZ > medicionesDER){
-//        int correccionIZ;
-//        
-//        correccionIZ =  (diferencia/medicionesIZ);
-//        pwmIZ = 255 - (255*correccionIZ);
-//      }
-//      Serial.print ("Derecha: ");
-//      Serial.println (medicionesDER);
-//      Serial.print ("Izquierda: ");
-//      Serial.println (medicionesIZ);
-//      delay (1000);
-//      
-//      medicionesIZ = 0;
-//      medicionesDER = 0;
-//      pollo = false;
-//      
-//    }
-//Fin Codigo Juan
-    //  digitalWrite(motor1pin1, HIGH);
-    //  digitalWrite(motor1pin2, LOW);
-    //
-    //  digitalWrite(motor2pin1, HIGH);
-    //  digitalWrite(motor2pin2, LOW);
-    //
-    // if (vueltas1 > 40 )
-    // {   digitalWrite(motor1pin1, LOW);
-    //  digitalWrite(motor1pin2, LOW);
-    //  }
-    //if (vueltas > 40)
-    //{
-    //    digitalWrite(motor2pin1, LOW);
-    //  digitalWrite(motor2pin2, LOW);
-    //  }
-
-
-  }
+}
  
