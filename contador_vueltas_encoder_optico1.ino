@@ -34,8 +34,8 @@ int intervalo = 100;
 unsigned long tiempoAhora2 = 0;
 int intervalo2 = 500;
 
-int pwmDER = 80;
-int pwmIZ = 60;
+int pwmDER = 130;
+int pwmIZ = 100;
 
 float diferenciaVPS;
 
@@ -108,6 +108,7 @@ void loop() {
  }
 //----------------------------------------------------------FIN DE MANEJO DE PWM-----------------------------------------------------
 //Codigo Javier
+
 float diferenciaDER = vueltasDER - vueltasIZ;
 float diferenciaIZ = vueltasIZ - vueltasDER;
 
@@ -166,10 +167,11 @@ if(diferenciaVPS != 0){
     }
     diferenciaVPS = 0;
 }
+
 //correcion de pwmIZ
 //FIN correcion de pwmIZ
 //CORRECION TERMINADA
-if(vueltasDER == 80){
+if(vueltasDER == 11.4){
 
   int TiempoFinal = (millis() /1000);
 
