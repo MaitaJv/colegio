@@ -1,6 +1,4 @@
 {
     "port": "COM5",
-    "board": "arduino:avr:uno",
-    "programmer": "arduino:arduinoisp",
-    "sketch": "contador_vueltas_encoder_optico1.ino"
+    "board": "arduino:avr:uno"
 }
