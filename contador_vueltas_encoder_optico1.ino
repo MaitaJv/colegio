@@ -13,6 +13,8 @@ int valueDER = 0;
 int checkIZ = 0;
 int checkDER = 0;
 
+int recorridoant = 1;
+
 bool checkIZ2 = false;
 bool checkDER2 = false;
 
@@ -31,7 +33,6 @@ bool prueba1 = true;
 bool prueba2 = true;
 bool fran = false; 
 bool hola = false;
-bool recorridoant = false;
 bool stop = false;
 
 unsigned long tiempoAhora = 0;
@@ -47,6 +48,9 @@ float diferenciaVPS;
 
 float millisMedicionesDER;
 float millisMedicionesIZ;
+
+float vueltasIZ = medicionesIZ / divisionesRueda;//se calculan las vueltas realizadas en base a las mediciones
+float vueltasDER = medicionesDER / divisionesRueda;//se calculan las vueltas realizadas en base a las mediciones
 
 void setup () {
   Serial.begin(9600);   //iniciar puerto serie
@@ -71,28 +75,103 @@ void setup () {
    pinMode(ENBIZ, OUTPUT);
 }
 
-void crasheate() {
-  while (1);
-}
+// void crasheate() {
+//   while (1);
+// }
 
 void girar(){
 
-  if ((medicionesDERvolatil <= 5) && (recorridoant == true) )
-  {
-    Serial.println("girando");
-    analogWrite(ENADER, pwmDER);
-    analogWrite(ENBIZ, pwmIZ);
+  //--------------------------------------------------------ENCODER IZQUIERDA--------------------------------------------------------------
+  valueIZ = digitalRead(sensorPinIZ);  //lectura digital de pin
 
+  if (valueIZ == LOW && checkIZ == 0) {
+    medicionesIZvolatil++;
+
+    checkIZ = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
+  }
+  if (valueIZ == HIGH && checkIZ == 1) {
+    checkIZ = 0;
+  }
+  
+  
+//--------------------------------------------------------FIN ENCODER IZQUIERDA--------------------------------------------------------------
+//---------------------------------------------------------ENCODER DERECHA--------------------------------------------------------------
+  valueDER = digitalRead(sensorPinDER );  //lectura digital de pin
+
+  if (valueDER == LOW && checkDER == 0) {
+    medicionesDERvolatil++;
+    checkDER = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
+  }
+  if (valueDER == HIGH && checkDER == 1) {
+    checkDER = 0;
+  }
+  
+  
+//--------------------------------------------------------FIN ENCODER DERECHA--------------------------------------------------------------
+
+
+  if (medicionesDERvolatil <=5)
+    {
+       analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
+       analogWrite(ENBIZ, pwmIZ); 
+     //control direction
+       digitalWrite(IN1DER, HIGH);
+       digitalWrite(IN2DER, LOW);
+       digitalWrite(IN3IZ, LOW);
+       digitalWrite(IN4IZ, HIGH);
+    }
+    else if (medicionesDERvolatil > 19)
+    {
+       analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
+       analogWrite(ENBIZ, 0); 
+     //control direction
+       digitalWrite(IN1DER, LOW);
+       digitalWrite(IN2DER, LOW);
+       digitalWrite(IN3IZ, LOW);
+       digitalWrite(IN4IZ, LOW);
+        recorridoant++;
+    }
+}
+
+void caminar(){
+  if (pollo == false ){
+    analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
+    analogWrite(ENBIZ, pwmIZ); 
+    //control direction
     digitalWrite(IN1DER, HIGH);
     digitalWrite(IN2DER, LOW);
-    digitalWrite(IN3IZ, LOW);
-    digitalWrite(IN4IZ, HIGH);
-    stop = true;
-
+    digitalWrite(IN3IZ, HIGH);
+    digitalWrite(IN4IZ, LOW);
   }
+ if(vueltasDER == 5){
+    recorridoant++;
+  }
+}
 
+void caminar2(){
+  if (pollo == false ){
+    analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
+    analogWrite(ENBIZ, pwmIZ); 
+    //control direction
+    digitalWrite(IN1DER, HIGH);
+    digitalWrite(IN2DER, LOW);
+    digitalWrite(IN3IZ, HIGH);
+    digitalWrite(IN4IZ, LOW);
+  }
+ if(vueltasDER == 5){
+    recorridoant++;
+  }
+}
 
-
+void parar(){
+  analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
+  analogWrite(ENBIZ, 0);
+//control direction
+  digitalWrite(IN1DER, LOW);
+  digitalWrite(IN2DER, LOW);
+  digitalWrite(IN3IZ, LOW);
+  digitalWrite(IN4IZ, LOW);
+  pollo = true;
 }
 
 void loop() {
@@ -101,14 +180,13 @@ void loop() {
 
   if (valueIZ == LOW && checkIZ == 0) {
     medicionesIZ++;
-    medicionesIZvolatil++;
 
     checkIZ = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
   }
   if (valueIZ == HIGH && checkIZ == 1) {
     checkIZ = 0;
   }
-  float vueltasIZ = medicionesIZ / divisionesRueda;//se calculan las vueltas realizadas en base a las mediciones
+  
   
 //--------------------------------------------------------FIN ENCODER IZQUIERDA--------------------------------------------------------------
 //---------------------------------------------------------ENCODER DERECHA--------------------------------------------------------------
@@ -116,26 +194,17 @@ void loop() {
 
   if (valueDER == LOW && checkDER == 0) {
     medicionesDER++;
-    medicionesDERvolatil++;
     checkDER = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
   }
   if (valueDER == HIGH && checkDER == 1) {
     checkDER = 0;
   }
-  float vueltasDER = medicionesDER / divisionesRueda;//se calculan las vueltas realizadas en base a las mediciones
+  
   
 //--------------------------------------------------------FIN ENCODER DERECHA--------------------------------------------------------------
 
 //----------------------------------------------------------MANEJO DE PWM-----------------------------------------------------
- if (pollo == false ){
-   analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
-   analogWrite(ENBIZ, pwmIZ); 
- //control direction
-   digitalWrite(IN1DER, HIGH);
-   digitalWrite(IN2DER, LOW);
-   digitalWrite(IN3IZ, HIGH);
-   digitalWrite(IN4IZ, LOW);
- }
+ 
 
  if (pollo == true ){
    analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
@@ -152,6 +221,19 @@ void loop() {
 
 //----------------------------------------------------------FIN DE MANEJO DE PWM-----------------------------------------------------
 //Codigo Javier
+
+  switch(recorridoant){
+    case 1: caminar();
+      break;
+    
+    case 2: girar();
+      break;
+    
+    case 3: caminar2();
+      break;
+    default: parar();
+  }
+
 /*
 float diferenciaDER = vueltasDER - vueltasIZ;
 float diferenciaIZ = vueltasIZ - vueltasDER;
@@ -213,50 +295,46 @@ if(millis() == (tiempoAhora + intervalo)){
 //FIN correcion de pwmIZ
 //CORRECION TERMINADA
 
-if ( stop == true)
-{
-   analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
-   analogWrite(ENBIZ, 0); 
-   //control direction
-   digitalWrite(IN1DER, LOW);
-   digitalWrite(IN2DER, LOW);
-   digitalWrite(IN3IZ, LOW);
-   digitalWrite(IN4IZ, LOW);
+// if ( stop == true)
+// {
+//    analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
+//    analogWrite(ENBIZ, 0); 
+//    //control direction
+//    digitalWrite(IN1DER, LOW);
+//    digitalWrite(IN2DER, LOW);
+//    digitalWrite(IN3IZ, LOW);
+//    digitalWrite(IN4IZ, LOW);
 
+// }
+//if(vueltasDER == 11.4){
 
+  // girar();
 
+  // int TiempoFinal = (millis() /1000);
 
+  // float VueltasPorSegundoDerecha = (medicionesDER/(20 * TiempoFinal));
+  // float VueltasPorSegundoIzquierda = (medicionesIZ/(20 * TiempoFinal));
 
-}
-if(vueltasDER == 11.4){
-
-  girar();
-
-  int TiempoFinal = (millis() /1000);
-
-  float VueltasPorSegundoDerecha = (medicionesDER/(20 * TiempoFinal));
-  float VueltasPorSegundoIzquierda = (medicionesIZ/(20 * TiempoFinal));
-
-  Serial.println("---------------------Terminado--------------------------");
-  Serial.print("Vueltas por segundo Motor Derecha: ");
-  Serial.print(VueltasPorSegundoDerecha);
-  Serial.print("Vueltas por segundo Motor Izquierda: ");
-  Serial.print(VueltasPorSegundoIzquierda);
-  Serial.println(pwmDER);
+  // Serial.println("---------------------Terminado--------------------------");
+  // Serial.print("Vueltas por segundo Motor Derecha: ");
+  // Serial.print(VueltasPorSegundoDerecha);
+  // Serial.print("Vueltas por segundo Motor Izquierda: ");
+  // Serial.print(VueltasPorSegundoIzquierda);
+  // Serial.println(pwmDER);
   
-  analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
-  analogWrite(ENBIZ, 0);
-//control direction
-  digitalWrite(IN1DER, LOW);
-  digitalWrite(IN2DER, LOW);
-  digitalWrite(IN3IZ, LOW);
-  digitalWrite(IN4IZ, LOW);
-  pollo = true;
+//   analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
+//   analogWrite(ENBIZ, 0);
+// //control direction
+//   digitalWrite(IN1DER, LOW);
+//   digitalWrite(IN2DER, LOW);
+//   digitalWrite(IN3IZ, LOW);
+//   digitalWrite(IN4IZ, LOW);
+//   pollo = true;
   
 
 
   //while(1) ;
-}
+//}
 //FIN CORRECION TERMINADA
 
 //Fin Codigo Javier
