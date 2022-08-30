@@ -1,16 +1,20 @@
 const int sensorPinIZ = 2;
 const int sensorPinDER = 3;
 
-float medicionesIZ = 0;
-float medicionesDER = 0;
+float medicionesIZ = 0; //Javier gei
+float medicionesDER = 0; //Ariel pro 
+float medicionesIZvolatil = 0; 
+float medicionesDERvolatil = 0;  
 
 int valueIZ = 0;
 int valueDER = 0;
 
-int i;
 
 int checkIZ = 0;
 int checkDER = 0;
+
+bool checkIZ2 = false;
+bool checkDER2 = false;
 
 float divisionesRueda = 20;
 
@@ -27,15 +31,17 @@ bool prueba1 = true;
 bool prueba2 = true;
 bool fran = false; 
 bool hola = false;
+bool recorridoant = false;
+bool stop = false;
 
 unsigned long tiempoAhora = 0;
-int intervalo = 500;
+int intervalo = 1000;
 
 unsigned long tiempoAhora2 = 0;
 int intervalo2 = 500;
 
-int pwmDER = 120;
-int pwmIZ = 60;
+int pwmDER = 255;
+int pwmIZ = 255;
 
 float diferenciaVPS;
 
@@ -66,98 +72,43 @@ void setup () {
 }
 
 
+
+
+
+
+
+
 void loop() {
 //--------------------------------------------------------ENCODER IZQUIERDA--------------------------------------------------------------
   valueIZ = digitalRead(sensorPinIZ);  //lectura digital de pin
 
   if (valueIZ == LOW && checkIZ == 0) {
     medicionesIZ++;
-    millisMedicionesIZ++;
-//    Serial.print("Mediciones:");
-//    Serial.println(medicionesIZ);
+    medicionesIZvolatil++;
+
     checkIZ = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
   }
   if (valueIZ == HIGH && checkIZ == 1) {
     checkIZ = 0;
   }
   float vueltasIZ = medicionesIZ / divisionesRueda;//se calculan las vueltas realizadas en base a las mediciones
-  /*Esto lo podria comentar*/
-//  if (Serial.available() > 0) {
-//    if (Serial.read() == '1') {
-//      Serial.print("Vueltas:");
-//      Serial.println (vueltasIZ);
-//    }
-//  }
-/**/
+  
 //--------------------------------------------------------FIN ENCODER IZQUIERDA--------------------------------------------------------------
 //---------------------------------------------------------ENCODER DERECHA--------------------------------------------------------------
   valueDER = digitalRead(sensorPinDER );  //lectura digital de pin
 
   if (valueDER == LOW && checkDER == 0) {
     medicionesDER++;
-    millisMedicionesDER++;
-//    Serial.print("Mediciones 2:");
-//    Serial.println(medicionesDER);
+    medicionesDERvolatil++;
     checkDER = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
   }
   if (valueDER == HIGH && checkDER == 1) {
     checkDER = 0;
   }
   float vueltasDER = medicionesDER / divisionesRueda;//se calculan las vueltas realizadas en base a las mediciones
-  /*Esto lo podria comentar*/
-//  if (Serial.available() > 0) {
-//    if (Serial.read() == '2') {
-//      Serial.print("Vueltas 2:");
-//      Serial.println (vueltasDER);
-//    }
-//  }
-/**/
+  
 //--------------------------------------------------------FIN ENCODER DERECHA--------------------------------------------------------------
-//  if (prueba1 == true){
-//    analogWrite(ENADER, 167);
-//    digitalWrite(IN1DER, HIGH);
-//    digitalWrite(IN2DER, LOW);
-//  }
-//  if (prueba2 == true){
-//    analogWrite(ENBIZ, 255);
-//    digitalWrite(IN3IZ, HIGH);
-//    digitalWrite(IN4IZ, LOW);
-//  }
-//
-//
-//  if (medicionesIZ > 226.8)
-//  {
-//     analogWrite(ENADER, 0);
-//    digitalWrite(IN1DER, HIGH);
-//    digitalWrite(IN2DER, HIGH);
-//    prueba1 =false;
-//    }
-//   if (medicionesIZ > 200)
-//  {
-//     analogWrite(ENADER, 0);
-//    digitalWrite(IN1DER, HIGH);
-//    digitalWrite(IN2DER, HIGH);
-//    pollo = true;
-//    Serial.print ("Mediciones: ");
-//    Serial.println (medicionesIZ);
-//    Serial.print ("tiempo: ");
-//    Serial.println (millis());
-//    
-//    }
-//    if (millis() - tiempo0 > 7000)
-//    {
-//      analogWrite(ENADER, 0);
-//      analogWrite(ENBIZ,  0);
-//      pollo = true;
-//      digitalWrite(IN1DER, HIGH);
-//      digitalWrite(IN2DER, HIGH);
-//      digitalWrite(IN3IZ, HIGH);
-//      digitalWrite(IN4IZ, HIGH);
-//      Serial.print ("Motor derecho: ");
-//      Serial.println (medicionesDER);
-//      Serial.print ("Motor izquierdo: ");
-//      Serial.println (medicionesIZ);
-//      }
+
 //----------------------------------------------------------MANEJO DE PWM-----------------------------------------------------
  if (pollo == false ){
    analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
@@ -168,12 +119,39 @@ void loop() {
    digitalWrite(IN3IZ, HIGH);
    digitalWrite(IN4IZ, LOW);
  }
+
+ if (recorridoant == true)
+ {
+    if (medicionesDERvolatil <=5)
+    {
+           analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
+   analogWrite(ENBIZ, pwmIZ); 
+ //control direction
+   digitalWrite(IN1DER, HIGH);
+   digitalWrite(IN2DER, LOW);
+   digitalWrite(IN3IZ, LOW);
+   digitalWrite(IN4IZ, HIGH);
+    }
+    else if (medicionesDERvolatil >5)
+    {
+       analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
+   analogWrite(ENBIZ, 0); 
+ //control direction
+   digitalWrite(IN1DER, LOW);
+   digitalWrite(IN2DER, LOW);
+   digitalWrite(IN3IZ, LOW);
+   digitalWrite(IN4IZ, LOW);
+    recorridoant = false;
+    }
+    
+ }
+ 
+
 //----------------------------------------------------------FIN DE MANEJO DE PWM-----------------------------------------------------
 //Codigo Javier
+/*
 float diferenciaDER = vueltasDER - vueltasIZ;
 float diferenciaIZ = vueltasIZ - vueltasDER;
-
-
 
 float vpsDER;
 float vpsIZ;
@@ -184,7 +162,7 @@ if(millis() == (tiempoAhora + intervalo)){
   vpsDER = millisMedicionesDER / divisionesRueda;
   vpsIZ = millisMedicionesIZ / divisionesRueda;
 
-  diferenciaVPS = (vpsDER - vpsIZ)*20;
+  diferenciaVPS = (vpsDER - vpsIZ)*5;
 
   Serial.print("Vueltas por segundo MOTOR-DERECHA: ");
   Serial.print(vpsDER);
@@ -211,27 +189,61 @@ if(millis() == (tiempoAhora + intervalo)){
   vpsIZ = 0;
 }
 
-if((millis() == (tiempoAhora2 + intervalo2)) && (pollo == false)){
-  tiempoAhora2 = millis();
-  }
+//if((millis() == (tiempoAhora2 + intervalo2)) && (pollo == false)){
+//  tiempoAhora2 = millis();
+//  }
 
 //correcion de pwmDER
-if(diferenciaVPS != 0){
-    Serial.print("Diferencia de VPS: ");
-    Serial.println(diferenciaVPS);
-    Serial.print("PWM DERECHA REDUCIDO 2, VALOR: ");
-    Serial.println(pwmDER);
-    pwmDER = pwmDER - diferenciaVPS;
-    if (pwmDER < 0) {
-      pwmDER = 0;
-    }
-    diferenciaVPS = 0;
-}
+//if(diferenciaVPS != 0){
+//    Serial.print("Diferencia de VPS: ");
+//    Serial.println(diferenciaVPS);
+//    Serial.print("PWM DERECHA REDUCIDO 2, VALOR: ");
+//    Serial.println(pwmDER);
+//    pwmDER = pwmDER - diferenciaVPS;
+//    if (pwmDER < 0) {
+//      pwmDER = 0;
+//    }
+//    diferenciaVPS = 0;
+//}
+*/
 //correcion de pwmIZ
 //FIN correcion de pwmIZ
 //CORRECION TERMINADA
-if(vueltasDER == 80){
-  
+
+
+
+
+
+
+
+if(vueltasDER == 11.4){
+ analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
+   analogWrite(ENBIZ, 0); 
+ //control direction
+   digitalWrite(IN1DER, LOW);
+   digitalWrite(IN2DER, LOW);
+   digitalWrite(IN3IZ, LOW);
+   digitalWrite(IN4IZ, LOW);
+   pollo = true;
+   recorridoant = true;
+   medicionesDERvolatil = 0;
+   medicionesIZvolatil = 0;
+
+
+/*
+  girar();
+
+  int TiempoFinal = (millis() /1000);
+
+  float VueltasPorSegundoDerecha = (medicionesDER/(20 * TiempoFinal));
+  float VueltasPorSegundoIzquierda = (medicionesIZ/(20 * TiempoFinal));
+
+  Serial.println("---------------------Terminado--------------------------");
+  Serial.print("Vueltas por segundo Motor Derecha: ");
+  Serial.print(VueltasPorSegundoDerecha);
+  Serial.print("Vueltas por segundo Motor Izquierda: ");
+  Serial.print(VueltasPorSegundoIzquierda);
+  Serial.println(pwmDER);
   
   analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
   analogWrite(ENBIZ, 0);
@@ -240,84 +252,14 @@ if(vueltasDER == 80){
   digitalWrite(IN2DER, LOW);
   digitalWrite(IN3IZ, LOW);
   digitalWrite(IN4IZ, LOW);
+  pollo = true;
+  */
 
-  while(1) ;
+
+  //while(1) ;
 }
 //FIN CORRECION TERMINADA
 
 //Fin Codigo Javier
-
-//        Serial.print ("vueltas1: ");
-//        Serial.print (medicionesDER);
-//        Serial.print ("vuesltas2: ");
-//        Serial.println (medicionesIZ);
-//        Serial.print ("time : ");
-
-//----------------------------------------------------------MUESTRA DE DATOS POR PUERTO SERIE-----------------------------------------------------
-//     if ((medicionesIZ >= 86.83) || (medicionesDER >= 86.83))
-//      {
-//          Serial.print ("vueltas1: ");
-//          Serial.print (vueltasDER);
-//          Serial.print ("vueltas2: ");
-//          Serial.println (vueltasIZ);
-//          Serial.print ("time : ");
-//          Serial.println (millis());
-//          
-//          analogWrite(ENADER, 0);
-//          analogWrite(ENBIZ, 0);
-//          
-//          digitalWrite(IN1DER, LOW);
-//          digitalWrite(IN2DER, LOW);
-//          digitalWrite(IN3IZ, LOW);
-//          digitalWrite(IN4IZ, LOW);
-//          
-//          pollo = true;  
-//     }
-//----------------------------------------------------------FIN DE MUESTRA DE DATOS POR PUERTO SERIE-----------------------------------------------------
-//Codigo Juan
-//    if (pollo == true){
-//      int diferencia;
-//      diferencia = abs(medicionesDER) - abs(medicionesIZ);
-//      if (medicionesDER > medicionesIZ){
-//        int correccionDER;
-//        
-//        correccionDER =  (diferencia/medicionesDER);
-//        pwmDER = 255 - (255*correccionDER);
-//      }
-//      if (medicionesIZ > medicionesDER){
-//        int correccionIZ;
-//        
-//        correccionIZ =  (diferencia/medicionesIZ);
-//        pwmIZ = 255 - (255*correccionIZ);
-//      }
-//      Serial.print ("Derecha: ");
-//      Serial.println (medicionesDER);
-//      Serial.print ("Izquierda: ");
-//      Serial.println (medicionesIZ);
-//      delay (1000);
-//      
-//      medicionesIZ = 0;
-//      medicionesDER = 0;
-//      pollo = false;
-//      
-//    }
-//Fin Codigo Juan
-    //  digitalWrite(motor1pin1, HIGH);
-    //  digitalWrite(motor1pin2, LOW);
-    //
-    //  digitalWrite(motor2pin1, HIGH);
-    //  digitalWrite(motor2pin2, LOW);
-    //
-    // if (vueltas1 > 40 )
-    // {   digitalWrite(motor1pin1, LOW);
-    //  digitalWrite(motor1pin2, LOW);
-    //  }
-    //if (vueltas > 40)
-    //{
-    //    digitalWrite(motor2pin1, LOW);
-    //  digitalWrite(motor2pin2, LOW);
-    //  }
-
-
-  }
+}
  
