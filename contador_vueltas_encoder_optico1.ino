@@ -1,8 +1,8 @@
 const int sensorPinIZ = 2;
 const int sensorPinDER = 3;
 
-float medicionesIZ = 0; //Javier gei
-float medicionesDER = 0; //Ariel pro 
+float medicionesIZ = 0;
+float medicionesDER = 0; 
 float medicionesIZvolatil = 0; 
 float medicionesDERvolatil = 0;  
 
@@ -74,10 +74,6 @@ void setup () {
    pinMode(IN4IZ, OUTPUT);
    pinMode(ENBIZ, OUTPUT);
 }
-
-// void crasheate() {
-//   while (1);
-// }
 
 void girar(){
 

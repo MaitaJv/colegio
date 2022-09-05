@@ -9,7 +9,6 @@ float medicionesDERvolatil = 0;
 int valueIZ = 0;
 int valueDER = 0;
 
-
 int checkIZ = 0;
 int checkDER = 0;
 
@@ -37,6 +36,8 @@ bool prueba2 = true;
 bool fran = false; 
 bool hola = false;
 bool stop = false;
+
+bool boolCaminar = false;
 
 unsigned long tiempoAhora = 0;
 int intervalo = 1000;
@@ -92,7 +93,6 @@ void girar(){
     checkIZgiro = 0;
   }
   
-  
 //--------------------------------------------------------FIN ENCODER IZQUIERDA--------------------------------------------------------------
 //---------------------------------------------------------ENCODER DERECHA--------------------------------------------------------------
   valueDER = digitalRead(sensorPinDER );  //lectura digital de pin
@@ -105,11 +105,9 @@ void girar(){
     checkDERgiro = 0;
   }
   
-  
 //--------------------------------------------------------FIN ENCODER DERECHA--------------------------------------------------------------
 
-
-  if (medicionesDERvolatil <=5)
+  if (medicionesDERvolatil <= 5)
     {
        analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
        analogWrite(ENBIZ, pwmIZ); 
@@ -132,19 +130,21 @@ void girar(){
     }
 }
 
-void caminar(){
-  if (pollo == false ){
-    analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
-    analogWrite(ENBIZ, pwmIZ); 
-    //control direction
-    digitalWrite(IN1DER, HIGH);
-    digitalWrite(IN2DER, LOW);
-    digitalWrite(IN3IZ, HIGH);
-    digitalWrite(IN4IZ, LOW);
-  }
- if(vueltasDER == 5){
-    recorridoant++;
-  }
+void caminar() {
+    boolCaminar = true;
+
+    if (vueltasDER == 11.4){
+        analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
+        analogWrite(ENBIZ, pwmIZ); 
+        //control direction
+        digitalWrite(IN1DER, HIGH);
+        digitalWrite(IN2DER, LOW);
+        digitalWrite(IN3IZ, HIGH);
+        digitalWrite(IN4IZ, LOW);
+    }
+    if(vueltasDER == 5){
+        recorridoant++;
+    }
 }
 
 void caminar2(){
@@ -178,8 +178,10 @@ void loop() {
   valueIZ = digitalRead(sensorPinIZ);  //lectura digital de pin
 
   if (valueIZ == LOW && checkIZ == 0) {
-    medicionesIZ++;
-
+    if (boolCaminar == true)
+    {
+        medicionesIZ++;    
+    }
     checkIZ = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
   }
   if (valueIZ == HIGH && checkIZ == 1) {
@@ -191,46 +193,43 @@ void loop() {
 //---------------------------------------------------------ENCODER DERECHA--------------------------------------------------------------
   valueDER = digitalRead(sensorPinDER );  //lectura digital de pin
 
-  if (valueDER == LOW && checkDER == 0) {
-    medicionesDER++;
-    checkDER = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
-  }
-  if (valueDER == HIGH && checkDER == 1) {
-    checkDER = 0;
-  }
-  
-  
+    if (valueDER == LOW && checkDER == 0) {
+        if (boolCaminar == true)
+        {
+            medicionesDER++;    
+        }
+        checkDER = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
+    }
+    if (valueDER == HIGH && checkDER == 1) {
+        checkDER = 0;
+    }
 //--------------------------------------------------------FIN ENCODER DERECHA--------------------------------------------------------------
 
-//----------------------------------------------------------MANEJO DE PWM-----------------------------------------------------
- 
-
- if (pollo == true ){
-   analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
-   analogWrite(ENBIZ, 0); 
- //control direction
-   digitalWrite(IN1DER, LOW);
-   digitalWrite(IN2DER, LOW);
-   digitalWrite(IN3IZ, LOW);
-   digitalWrite(IN4IZ, LOW);
-   recorridoant = false;
-   medicionesDERvolatil = 0;
-   medicionesIZvolatil = 0;
- }
-
-//----------------------------------------------------------FIN DE MANEJO DE PWM-----------------------------------------------------
 //Codigo Javier
 
   switch(recorridoant){
-    case 1: caminar();
-      break;
-    
-    case 2: girar();
-      break;
-    
-    case 3: caminar2();
-      break;
-    default: parar();
-  }
+        case 1: caminar();
+        break;
+        
+        case 2: girar();
+        break;
+        
+        case 3: caminar2();
+        break;
+        
+        default: parar();
+    }
+
+    if (pollo == true ){
+        analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
+        analogWrite(ENBIZ, 0); 
+        //control direction
+        digitalWrite(IN1DER, LOW);
+        digitalWrite(IN2DER, LOW);
+        digitalWrite(IN3IZ, LOW);
+        digitalWrite(IN4IZ, LOW);
+        recorridoant = false;
+        medicionesDERvolatil = 0;
+        medicionesIZvolatil = 0;
+    }
 }
- 
