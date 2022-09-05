@@ -1,0 +1,58 @@
+#include <Simple_MPU6050.h>
+#define MPU6050_DEFAULT_ADDRESS     0x68 // address pin low (GND), default for InvenSense evaluation board
+
+Simple_MPU6050 mpu;
+
+//*****************************
+//******              Callback Funciton                ********
+//*****************************
+
+void Print_Values (int16_t *gyro, int16_t *accel, int32_t *quat) {
+  Quaternion q;
+  VectorFloat gravity;
+  float ypr[3] = { 0, 0, 0 };
+  float xyz[3] = { 0, 0, 0 };
+  mpu.GetQuaternion(&q, quat);
+  mpu.GetGravity(&gravity, &q);
+  mpu.GetYawPitchRoll(ypr, &q, &gravity);
+  mpu.ConvertToDegrees(ypr, xyz);
+  
+  Serial.print(F("X "));   Serial.print(xyz[0]);   Serial.print(F(",   "));
+  Serial.print(F("Y "));   Serial.print(xyz[1]);   Serial.print(F(",   "));
+  Serial.print(F("Z "));   Serial.print(xyz[2]);   Serial.print(F(",   "));
+  Serial.print(F("gx "));  Serial.print(gyro[0]);  Serial.print(F(",   "));
+  Serial.print(F("gy "));  Serial.print(gyro[1]);  Serial.print(F(",   "));
+  Serial.print(F("gz "));  Serial.print(gyro[2]);  Serial.print(F("\n"));
+  Serial.println();
+}
+
+//*****************************
+//******                Setup and Loop                 ********
+//*****************************
+
+void setup() {
+Serial.begin(115200);
+  Serial.println(F("Start:"));
+  mpu.Set_DMP_Output_Rate_Hz(100);
+#ifdef OFFSETS
+  Serial.println(F("Using Offsets"));
+  mpu.SetAddress(MPU6050_DEFAULT_ADDRESS);
+  mpu.load_DMP_Image(OFFSETS);
+#else
+  Serial.println(F(" Since no offsets are defined we are going to calibrate this specific MPU6050,\n"
+                   " Start by having the MPU6050 placed stationary on a flat surface to get a proper accelerometer calibration\n"
+                   " Place the new offsets on the #define OFFSETS... line at top of program for super quick startup\n\n"
+                   " \t\t\t[Press Any Key]"));
+  while (Serial.available() && Serial.read());
+  while (!Serial.available());
+  while (Serial.available() && Serial.read());
+  mpu.SetAddress(MPU6050_DEFAULT_ADDRESS);
+  mpu.CalibrateMPU();
+  mpu.load_DMP_Image();
+#endif
+  mpu.on_FIFO(Print_Values);
+}
+
+void loop() {
+  mpu.dmp_read_fifo(false);
+}

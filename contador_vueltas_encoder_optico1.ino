@@ -9,7 +9,6 @@ float medicionesDERvolatil = 0;
 int valueIZ = 0;
 int valueDER = 0;
 
-
 int checkIZ = 0;
 int checkDER = 0;
 
@@ -40,8 +39,8 @@ int intervalo = 1000;
 unsigned long tiempoAhora2 = 0;
 int intervalo2 = 500;
 
-int pwmDER = 255;
-int pwmIZ = 255;
+int pwmDER = 200;
+int pwmIZ = 200;
 
 float diferenciaVPS;
 
@@ -72,19 +71,13 @@ void setup () {
 }
 
 
-
-
-
-
-
-
 void loop() {
 //--------------------------------------------------------ENCODER IZQUIERDA--------------------------------------------------------------
   valueIZ = digitalRead(sensorPinIZ);  //lectura digital de pin
 
   if (valueIZ == LOW && checkIZ == 0) {
     medicionesIZ++;
-    medicionesIZvolatil++;
+    millisMedicionesIZ++;
 
     checkIZ = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
   }
@@ -99,7 +92,7 @@ void loop() {
 
   if (valueDER == LOW && checkDER == 0) {
     medicionesDER++;
-    medicionesDERvolatil++;
+    millisMedicionesDER++;
     checkDER = 1;//¿checkIZ podria ser una boleana?¿en realmente necesaria?
   }
   if (valueDER == HIGH && checkDER == 1) {
@@ -120,36 +113,22 @@ void loop() {
    digitalWrite(IN4IZ, LOW);
  }
 
- if (recorridoant == true)
- {
-    if (medicionesDERvolatil <=5)
-    {
-           analogWrite(ENADER, pwmDER);//Se utiliza pwm para manejar las velocidades del motor
-   analogWrite(ENBIZ, pwmIZ); 
- //control direction
-   digitalWrite(IN1DER, HIGH);
-   digitalWrite(IN2DER, LOW);
-   digitalWrite(IN3IZ, LOW);
-   digitalWrite(IN4IZ, HIGH);
-    }
-    else if (medicionesDERvolatil >5)
-    {
-       analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
+ if (pollo == true ){
+   analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
    analogWrite(ENBIZ, 0); 
  //control direction
    digitalWrite(IN1DER, LOW);
    digitalWrite(IN2DER, LOW);
    digitalWrite(IN3IZ, LOW);
    digitalWrite(IN4IZ, LOW);
-    recorridoant = false;
-    }
-    
+   recorridoant = false;
+   medicionesDERvolatil = 0;
+   medicionesIZvolatil = 0;
  }
- 
 
 //----------------------------------------------------------FIN DE MANEJO DE PWM-----------------------------------------------------
 //Codigo Javier
-/*
+
 float diferenciaDER = vueltasDER - vueltasIZ;
 float diferenciaIZ = vueltasIZ - vueltasDER;
 
@@ -162,7 +141,7 @@ if(millis() == (tiempoAhora + intervalo)){
   vpsDER = millisMedicionesDER / divisionesRueda;
   vpsIZ = millisMedicionesIZ / divisionesRueda;
 
-  diferenciaVPS = (vpsDER - vpsIZ)*5;
+  diferenciaVPS = (vpsDER - vpsIZ)*50;
 
   Serial.print("Vueltas por segundo MOTOR-DERECHA: ");
   Serial.print(vpsDER);
@@ -189,49 +168,39 @@ if(millis() == (tiempoAhora + intervalo)){
   vpsIZ = 0;
 }
 
-//if((millis() == (tiempoAhora2 + intervalo2)) && (pollo == false)){
-//  tiempoAhora2 = millis();
-//  }
+if((millis() == (tiempoAhora2 + intervalo2)) && (pollo == false)){
+ tiempoAhora2 = millis();
+ }
 
 //correcion de pwmDER
-//if(diferenciaVPS != 0){
-//    Serial.print("Diferencia de VPS: ");
-//    Serial.println(diferenciaVPS);
-//    Serial.print("PWM DERECHA REDUCIDO 2, VALOR: ");
-//    Serial.println(pwmDER);
-//    pwmDER = pwmDER - diferenciaVPS;
-//    if (pwmDER < 0) {
-//      pwmDER = 0;
-//    }
-//    diferenciaVPS = 0;
-//}
-*/
+if(diferenciaVPS != 0){
+   Serial.print("Diferencia de VPS: ");
+   Serial.println(diferenciaVPS);
+   Serial.print("PWM DERECHA REDUCIDO 2, VALOR: ");
+   Serial.println(pwmDER);
+   pwmDER = pwmDER - diferenciaVPS;
+   if (pwmDER < 0) {
+     pwmDER = 0;
+   }
+   diferenciaVPS = 0;
+}
+
 //correcion de pwmIZ
 //FIN correcion de pwmIZ
 //CORRECION TERMINADA
 
-
-
-
-
-
-
-if(vueltasDER == 11.4){
- analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
+if ( pollo == true)
+{
+   analogWrite(ENADER, 0);//Se utiliza pwm para manejar las velocidades del motor
    analogWrite(ENBIZ, 0); 
- //control direction
+   //control direction
    digitalWrite(IN1DER, LOW);
    digitalWrite(IN2DER, LOW);
    digitalWrite(IN3IZ, LOW);
    digitalWrite(IN4IZ, LOW);
-   pollo = true;
-   recorridoant = true;
-   medicionesDERvolatil = 0;
-   medicionesIZvolatil = 0;
 
-
-/*
-  girar();
+}
+if(vueltasDER == 50){
 
   int TiempoFinal = (millis() /1000);
 
@@ -253,10 +222,10 @@ if(vueltasDER == 11.4){
   digitalWrite(IN3IZ, LOW);
   digitalWrite(IN4IZ, LOW);
   pollo = true;
-  */
+  
 
 
-  //while(1) ;
+  while(1) ;
 }
 //FIN CORRECION TERMINADA
 
